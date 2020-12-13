@@ -8,7 +8,7 @@ def make_coordinates(image, parameters):
     y2 = int(y1*3/5)
     x1 = int((y1 - intercept)/slope)
     x2 = int((y2 - intercept)/slope)
-    return np.array([x1, y1, x2, y2])s
+    return np.array([x1, y1, x2, y2])
 
 
 def average_slope_intercept(image, lines):
@@ -70,15 +70,18 @@ def region_of_interest(image):
 
 cap = cv2.VideoCapture("test2.mp4")
 while cap.isOpened():
-    _, frame = cap.read()
-    edges = canny(frame)
-    cropped_images = region_of_interest(edges)
-    lines = cv2.HoughLinesP(cropped_images, 2, np.pi / 180, 20, np.array([]), minLineLength=10, maxLineGap=5)
-    averaged_lines = average_slope_intercept(frame, lines)
-    line_image = display_lines(frame, averaged_lines)
-    detected = cv2.addWeighted(frame, 0.6, line_image, 1, 1)
-    cv2.imshow("result", detected)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    ret, frame = cap.read()
+    if ret:
+        edges = canny(frame)
+        cropped_images = region_of_interest(edges)
+        lines = cv2.HoughLinesP(cropped_images, 2, np.pi / 180, 40, np.array([]), minLineLength=10, maxLineGap=5)
+        averaged_lines = average_slope_intercept(frame, lines)
+        line_image = display_lines(frame, averaged_lines)
+        detected = cv2.addWeighted(frame, 0.6, line_image, 1, 1)
+        cv2.imshow("result", detected)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    else:
         break
 cap.release()
 cv2.destroyAllWindows()
